@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('resume') as File;
     const companyName = formData.get('companyName') as string;
     const jobTitle = formData.get('jobTitle') as string;
+    const requiredSkills = formData.get('requiredSkills') as string | null;
 
     if (!file || !companyName || !jobTitle) {
       console.error('Missing required fields');
@@ -75,17 +76,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate cold email using Groq
-    const prompt = `Based on the following resume content, create a professional cold email for applying to a ${jobTitle} position at ${companyName}. 
+    // Template for the AI to follow
+    const template = `
+Dear HR Manager,
+
+I hope you are doing well. I am writing to express my interest in the Full Stack Developer Intern position at your company. I have completed a Bachelor's in Information Technology and have experience in software engineering, including full stack development, data structures, and algorithms.
+
+In addition to my education, I have worked on various projects and freelancing, gaining hands-on experience with technologies like Python, Java, HTML, CSS, JavaScript, as well as frameworks such as Node, Flask, and ReactJS. Have done more than 650 plus question of DSA on leetcode and other such platforms.
+
+I would love the opportunity to connect and discuss how my skills can meet the needs of your team.
+
+Thank you for your time and consideration.
+`;
+
+    // Build the prompt
+    let prompt = `Based on the following resume content, create a professional cold email for applying to a ${jobTitle} position at ${companyName}. 
 
 Resume Content:
 ${resumeText}
+`;
+
+    if (requiredSkills) {
+      prompt += `
+Required Skills for the job: ${requiredSkills}
+Please make the email more focused on these skills and how the candidate matches them.
+`;
+    }
+
+    prompt += `
+Please use the following template as a style and structure reference, and make the email more like this (but personalized and unique):
+
+${template}
 
 Please generate:
 1. A compelling subject line
 2. A professional email body that:
    - Is personalized and specific to the company and role
-   - Highlights relevant skills and experiences from the resume
+   - Highlights relevant skills and experiences from the resume${requiredSkills ? ' and required skills' : ''}
    - Shows genuine interest in the company
    - Includes a clear call to action
    - Is concise but impactful (1-2 paragraphs max)
@@ -95,7 +122,8 @@ Format your response as JSON with two fields:
 - "subject": the subject line
 - "content": the full email body
 
-Make it compelling and authentic, avoiding generic templates.`;
+Make it compelling and authentic, avoiding generic templates.
+`;
 
     console.log('Sending prompt to Groq:', prompt);
 

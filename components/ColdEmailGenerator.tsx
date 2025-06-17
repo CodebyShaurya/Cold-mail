@@ -21,6 +21,7 @@ export default function ColdEmailGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [requiredSkills, setRequiredSkills] = useState('');
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -62,7 +63,7 @@ export default function ColdEmailGenerator() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!file || !companyName.trim() || !jobTitle.trim()) {
       toast.error('Please fill in all fields and upload your resume.');
       return;
@@ -73,6 +74,9 @@ export default function ColdEmailGenerator() {
     formData.append('resume', file);
     formData.append('companyName', companyName.trim());
     formData.append('jobTitle', jobTitle.trim());
+    if (requiredSkills.trim()) {
+      formData.append('requiredSkills', requiredSkills.trim());
+    }
 
     try {
       const response = await fetch('/api/generate-email', {
@@ -221,6 +225,20 @@ export default function ColdEmailGenerator() {
                     onChange={(e) => setJobTitle(e.target.value)}
                     className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
                   />
+                </div>
+
+                {/* Required Skills (Optional) */}
+                <div className="space-y-2">
+                  <Label htmlFor="requiredSkills">Required Skills <span className="text-xs text-gray-400">(optional)</span></Label>
+                  <Input
+                    id="requiredSkills"
+                    type="text"
+                    placeholder="e.g., React, Node.js, Python"
+                    value={requiredSkills}
+                    onChange={(e) => setRequiredSkills(e.target.value)}
+                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <p className="text-xs text-gray-400">Add comma-separated skills to make the email more job-focused.</p>
                 </div>
 
                 {/* Submit Button */}
