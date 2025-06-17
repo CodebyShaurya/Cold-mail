@@ -17,7 +17,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Favicon */}
+        <link rel="icon" href="https://icons.veryicon.com/png/o/business/oa-office/mail-227.png" />
+      </head>
       <body className={inter.className}>
+        {/* Logo at the top center */}
+        
         {children}
         <Toaster />
       </body>
